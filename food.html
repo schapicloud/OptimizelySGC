@@ -1,0 +1,71 @@
+<html>
+	<head>
+	  <title>Choose Your Food!</title>
+	  <!-- Install Optimizely SDK -->
+	  <script src="https://unpkg.com/@optimizely/optimizely-sdk/dist/optimizely.browser.umd.min.js"></script>
+	  <!-- Add your datafile using your SDK key so you can later instantiate an  Optimizely client -->
+	  <script src="https://cdn.optimizely.com/datafiles/8Gm4xCtBWkerenZb2Jz9E.json/tag.js"></script>
+	</head>
+	
+	<body>  
+	  <h1>Choose Your Food!</h1>  
+	  <div id="imgDiv"><img style="width:200px;height:200px;" src="" id="img" /></div>
+	  <p id="subtitle">We'll use this subtitle to show flag status</p>
+	  <button id="button">Click to buy</button>
+	</body>
+	
+	<script>
+	  // instantiate an Optimizely client from the datafile
+	  var optimizelyClientInstance = window.optimizelySdk.createInstance({
+		datafile: window.optimizelyDatafile
+	  });
+	  /* --------------------------------
+		 OPTIONAL: Add a notification listener so you can later integrate with third party analytics platforms
+		 --------------------------------
+		 */
+	  var listenerId = optimizelyClientInstance.notificationCenter.addNotificationListener(
+		window.optimizelySdk.enums.NOTIFICATION_TYPES.DECISION,
+		function(decision) {
+		  console.log(
+			`NOTIFICATION LISTENER: User bucketing event for:
+				  User: ${decision.userId}
+				  Variation: ${decision.decisionInfo.sourceInfo["variationKey"]}
+				  Experiment: ${decision.decisionInfo.sourceInfo["experimentKey"]}`);
+		  // send decision to an anayltics platform here
+		}
+	  );
+	  
+	  function makeid() {
+		  var userId = "";
+		  userId = String(Math.random());
+		  return userId;
+	  };
+    
+	  // make a random userID
+	  var userId = makeid();
+
+	  // get flag enabled status
+	  var enabled = optimizelyClientInstance.isFeatureEnabled('foodchoice', userId);
+    
+	  if (enabled) {
+		  // get the flag variable value, as determined by the variation the user buckets into
+		  const pizza = optimizelyClientInstance.getFeatureVariable('foodchoice', 'pizza', userId);
+		  document.querySelector("#subtitle").innerText = "User No.: " + userId + " got pizza!";
+		  document.getElementById("img").src = pizza;
+		  document.getElementById("button").innerText = "Click to Buy Pizza";
+	  } else {
+		  const sushi = optimizelyClientInstance.getFeatureVariable('foodchoice', 'sushi', userId);
+		  document.querySelector("#subtitle").innerText = "User No.: " + userId + " got sushi!";
+		  document.getElementById("img").src = sushi;
+		  document.getElementById("button").innerText = "Click to Buy Sushi";
+	  }
+	  
+    const button = document.querySelector('button')
+	  button.addEventListener('click', function(e) {
+		optimizelyClientInstance.track('purchase', userId);
+		console.log("Optimizely tracked a purchase event to show in experiment results")
+		
+	  })
+	</script>
+	
+	</html>
