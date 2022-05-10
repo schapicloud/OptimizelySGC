@@ -12,5 +12,5 @@ Simulate a purchase by clicking button - this will track a purchase event to sho
 
 Code checked to run in:
 
-Google Chrome (Version 100.0.4896.127)
+Google Chrome (Version 100.0.4896.127), 
 Safari (Version 15.4 (17613.1.17.1.6)
